@@ -583,14 +583,26 @@ async function submitForm(e) {
   btn.innerHTML = '<i class="bi bi-hourglass-split"></i> กำลังส่งข้อมูล...';
 
   try {
+    // รวบรวมข้อมูลทุก field เป็น URL-encoded (Apps Script อ่านได้ผ่าน e.parameter)
     var form = document.getElementById('form-main');
-    var data = new FormData(form);
+    var payload = new URLSearchParams();
+    payload.append('ชื่อ',                           document.querySelector('input[name="ชื่อ"]').value.trim());
+    payload.append('นามสกุล',                        document.querySelector('input[name="นามสกุล"]').value.trim());
+    payload.append('เบอร์โทร_LINE_ID',              document.querySelector('input[name="เบอร์โทร_LINE_ID"]').value.trim());
+    payload.append('วันที่เริ่มคุ้มครอง',            document.querySelector('input[name="วันที่เริ่มคุ้มครอง"]').value.trim());
+    payload.append('ช่องทางติดต่อ',                  document.getElementById('h_channel').value);
+    payload.append('ประเภทที่อยู่อาศัย',              document.getElementById('h_type').value);
+    payload.append('จังหวัด',                        document.getElementById('province').value.trim());
+    payload.append('ทุนประกัน_สิ่งปลูกสร้าง',        document.querySelector('select[name="ทุนประกัน_สิ่งปลูกสร้าง"]').value);
+    payload.append('ทุนประกัน_ทรัพย์สินภายในบ้าน',   document.querySelector('select[name="ทุนประกัน_ทรัพย์สินภายในบ้าน"]').value);
+    payload.append('ความคุ้มครองเพิ่มเติมที่เลือก',   document.getElementById('h_coverage').value);
 
-    // ส่งไป Google Apps Script (no-cors เพราะ cross-origin)
+    // ส่งไป Google Apps Script
     await fetch('https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec', {
       method: 'POST',
       mode: 'no-cors',
-      body: data
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: payload.toString()
     });
 
     // แสดงผล thank-you (no-cors ไม่ return response แต่ข้อมูลส่งถึงแน่นอน)
