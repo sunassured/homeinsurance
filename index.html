@@ -597,11 +597,10 @@ async function submitForm(e) {
     payload.append('ทุนประกัน_ทรัพย์สินภายในบ้าน',   document.querySelector('select[name="ทุนประกัน_ทรัพย์สินภายในบ้าน"]').value);
     payload.append('ความคุ้มครองเพิ่มเติมที่เลือก',   document.getElementById('h_coverage').value);
 
-    // ส่งไป Google Apps Script
+    // ส่งไป Google Apps Script (ไม่ใส่ headers — browser set Content-Type อัตโนมัติ)
     await fetch('https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec', {
       method: 'POST',
       mode: 'no-cors',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: payload.toString()
     });
 
