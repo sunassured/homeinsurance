@@ -179,6 +179,22 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
   .hero-stats{grid-template-columns:repeat(3,1fr)}
   .stat-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ─── BROCHURE MODAL ─── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(12,68,124,0.55);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:var(--r-lg);width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(12,68,124,0.25)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-hd .mt{font-size:14px;font-weight:600;color:var(--navy)}
+.modal-hd .ms{font-size:11px;color:var(--sub);margin-top:2px}
+.modal-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--sub);flex-shrink:0}
+.modal-body{flex:1;overflow:hidden}
+.modal-body iframe{width:100%;height:100%;min-height:65vh;border:none;display:block}
+.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#F7FAFE}
+.modal-foot .mf-note{font-size:11px;color:var(--hint)}
+.brochure-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--blue);text-decoration:none;font-weight:500}
+.brochure-trigger{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);margin-top:10px;cursor:pointer;background:none;border:none;font-family:var(--font);padding:0;text-decoration:underline;text-underline-offset:2px}
+.brochure-trigger:hover{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -460,6 +476,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
       <i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี
     </button>
     <p class="cta-micro">หากข้อมูลครบถ้วน ทีมงานจะจัดทำใบเสนอราคาให้โดยปกติภายใน 1 ชั่วโมงในเวลาทำการ<br/>ข้อมูลของคุณใช้เพื่อจัดทำใบเสนอราคาเท่านั้น ไม่มีค่าใช้จ่าย และไม่มีข้อผูกมัดในการทำประกัน</p>
+  <div style="text-align:center;margin-top:8px">
+    <button class="brochure-trigger" onclick="openBrochure()">
+      <i class="bi bi-file-earmark-pdf" style="color:#E24B4A"></i>
+      อยากดูรายละเอียดความคุ้มครองก่อน? ดูโบรชัวร์ Master Home
+    </button>
+  </div>
 
   </form>
 
@@ -552,6 +574,67 @@ function prepareSubmit() {
 
 // Init
 updateCoverage();
+
+// Brochure modal
+function openBrochure() {
+  var url = 'https://sunassured.github.io/homeinsurance/Master-Home-Brochure-TH-AAGI.pdf';
+  document.getElementById('brochureFrame').src = url;
+  document.getElementById('brochureDownload').href = url;
+  document.getElementById('brochureModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeBrochure(e) {
+  if (e.target === document.getElementById('brochureModal')) {
+    document.getElementById('brochureModal').classList.remove('open');
+    document.getElementById('brochureFrame').src = '';
+    document.body.style.overflow = '';
+  }
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var m = document.getElementById('brochureModal');
+    if (m && m.classList.contains('open')) {
+      m.classList.remove('open');
+      document.getElementById('brochureFrame').src = '';
+      document.body.style.overflow = '';
+    }
+  }
+});
+
+window.addEventListener('scroll', function(){
+  var btn = document.getElementById('scrollTop');
+  if (window.scrollY > 400) { btn.classList.add('show'); } else { btn.classList.remove('show'); }
+});
+
+if (window.location.search.indexOf('submitted=1') >= 0) {
+  var f = document.getElementById('form-main');
+  var t = document.getElementById('thank-card');
+  if (f) f.style.display = 'none';
+  if (t) t.style.display = 'block';
+  window.scrollTo({ top: document.getElementById('quote').offsetTop - 80, behavior: 'smooth' });
+}
 </script>
+
+<!-- BROCHURE MODAL -->
+<div class="modal-overlay" id="brochureModal" onclick="closeBrochure(event)">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div>
+        <div class="mt">Master Home — Allianz Ayudhya General Insurance</div>
+        <div class="ms">โบรชัวร์ประกันภัยที่อยู่อาศัย Version Oct 2025</div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('brochureModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="brochureFrame" src="" title="Master Home Brochure"></iframe>
+    </div>
+    <div class="modal-foot">
+      <span class="mf-note">เงื่อนไขเป็นไปตามที่บริษัทกำหนด</span>
+      <a class="brochure-link" id="brochureDownload" href="#" download target="_blank">
+        <i class="bi bi-download"></i> ดาวน์โหลด PDF
+      </a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
