@@ -354,7 +354,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
 <div class="section" id="quote">
   <div class="sec-label"><span class="bar"></span><h2>ขอใบเสนอราคาฟรี</h2></div>
 
-  <form id="form-main" onsubmit="submitForm(event)">
+  <form id="form-main" action="https://formspree.io/f/mlgybdgk" method="POST" onsubmit="return prepareSubmit()">
+    <input type="hidden" name="_next" value="https://sunassured.github.io/homeinsurance/?submitted=1"/>
+    <input type="hidden" name="_subject" value="ใบเสนอราคาประกันภัยที่อยู่อาศัย — SunAssured"/>
 
     <!-- hidden fields สำหรับ chip/checkbox values -->
     <input type="hidden" id="h_type" name="ประเภทที่อยู่อาศัย" value="บ้านเดี่ยว"/>
@@ -454,7 +456,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
     </div>
 
     <!-- CTA -->
-    <button type="submit" class="cta-btn" id="submitBtn" style="margin-top:14px">
+    <button type="submit" class="cta-btn" style="margin-top:14px">
       <i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี
     </button>
     <p class="cta-micro">หากข้อมูลครบถ้วน ทีมงานจะจัดทำใบเสนอราคาให้โดยปกติภายใน 1 ชั่วโมงในเวลาทำการ<br/>ข้อมูลของคุณใช้เพื่อจัดทำใบเสนอราคาเท่านั้น ไม่มีค่าใช้จ่าย และไม่มีข้อผูกมัดในการทำประกัน</p>
@@ -537,52 +539,18 @@ function updateCoverage() {
     : 'ไม่ต้องการความคุ้มครองเพิ่มเติม';
 }
 
-// Submit → ส่ง Formspree แล้วแสดง thank-you
-async function submitForm(e) {
-  e.preventDefault();
+// Submit — native form, JS แค่ sync hidden fields ก่อน submit
+function prepareSubmit() {
   updateCoverage();
-
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> กำลังส่งข้อมูล...';
-
-  var form = document.getElementById('form-main');
-  var data = new FormData(form);
-
-  try {
-    var res = await fetch('https://formspree.io/f/mlgybdgk', {
-      method: 'POST',
-      body: data,
-      headers: { 'Accept': 'application/json' }
-    });
-
-    if (res.ok) {
-      // แสดง thank-you card พร้อมสรุปข้อมูล
-      document.getElementById('ty_type').textContent = document.getElementById('h_type').value;
-      document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
-      document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || 'ไม่ระบุ';
-      document.getElementById('ty_channel').textContent = document.getElementById('h_channel').value;
-      form.style.display = 'none';
-      document.getElementById('thank-card').style.display = 'block';
-      window.scrollTo({ top: document.getElementById('thank-card').offsetTop - 80, behavior: 'smooth' });
-    } else {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี';
-      alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือติดต่อ LINE @SunAssured โดยตรงครับ');
-    }
-  } catch(err) {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี';
-    alert('ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่ หรือติดต่อ LINE @SunAssured โดยตรงครับ');
-  }
+  // sync chip values
+  var typeEl = document.querySelector('#typeChips .chip.sel');
+  if (typeEl) document.getElementById('h_type').value = typeEl.textContent.trim();
+  var chanEl = document.querySelector('#chanChips .chip.sel');
+  if (chanEl) document.getElementById('h_channel').value = chanEl.textContent.trim();
+  return true; // allow native submit
 }
 
-window.addEventListener('scroll', function(){
-  var btn = document.getElementById('scrollTop');
-  if (window.scrollY > 400) { btn.classList.add('show'); } else { btn.classList.remove('show'); }
-});
-
-// Init coverage hidden field
+// Init
 updateCoverage();
 </script>
 </body>
