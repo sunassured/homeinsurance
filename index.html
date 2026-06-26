@@ -354,91 +354,118 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
 <div class="section" id="quote">
   <div class="sec-label"><span class="bar"></span><h2>ขอใบเสนอราคาฟรี</h2></div>
 
-  <!-- Card 1: ข้อมูลที่อยู่อาศัย + ทุนประกัน + ความคุ้มครอง -->
-  <div class="form-wrap" id="form-main">
-    <div class="fh">ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี</div>
-    <div class="fs">ส่งข้อมูลเบื้องต้นให้เราช่วยเช็กแผนที่เหมาะกับบ้านของคุณ พร้อมเปรียบเทียบความคุ้มครองสำคัญ เช่น ไฟไหม้ น้ำท่วม พายุ แผ่นดินไหว โจรกรรม และทรัพย์สินภายในบ้าน</div>
-    <div class="form-pills">
-      <span><i class="bi bi-clock"></i> ใช้เวลาไม่เกิน 1 นาที</span>
-      <span><i class="bi bi-check-circle"></i> ไม่มีค่าใช้จ่าย</span>
-      <span><i class="bi bi-shield-check"></i> ไม่มีข้อผูกมัดในการทำประกัน</span>
-    </div>
+  <form id="form-main" onsubmit="submitForm(event)">
 
-    <div class="divider">ข้อมูลที่อยู่อาศัย</div>
-    <div class="field">
-      <label>ประเภทที่อยู่อาศัย <span class="req">*</span></label>
-      <div class="chips" id="typeChips">
-        <div class="chip sel" onclick="selChip(this,'typeChips')">บ้านเดี่ยว</div>
-        <div class="chip sm" onclick="selChip(this,'typeChips')">บ้านแฝด / ทาวน์โฮม / ตึกแถว</div>
-        <div class="chip sm" onclick="selChip(this,'typeChips')">คอนโดมิเนียม / ห้องชุด</div>
+    <!-- hidden fields สำหรับ chip/checkbox values -->
+    <input type="hidden" id="h_type" name="ประเภทที่อยู่อาศัย" value="บ้านเดี่ยว"/>
+    <input type="hidden" id="h_channel" name="ช่องทางติดต่อ" value="LINE"/>
+    <input type="hidden" id="h_coverage" name="ความคุ้มครองเพิ่มเติมที่เลือก" value=""/>
+
+    <!-- Card 1: ข้อมูลที่อยู่อาศัย + ทุนประกัน + ความคุ้มครอง -->
+    <div class="form-wrap">
+      <div class="fh">ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี</div>
+      <div class="fs">ส่งข้อมูลเบื้องต้นให้เราช่วยเช็กแผนที่เหมาะกับบ้านของคุณ พร้อมเปรียบเทียบความคุ้มครองสำคัญ เช่น ไฟไหม้ น้ำท่วม พายุ แผ่นดินไหว โจรกรรม และทรัพย์สินภายในบ้าน</div>
+      <div class="form-pills">
+        <span><i class="bi bi-clock"></i> ใช้เวลาไม่เกิน 1 นาที</span>
+        <span><i class="bi bi-check-circle"></i> ไม่มีค่าใช้จ่าย</span>
+        <span><i class="bi bi-shield-check"></i> ไม่มีข้อผูกมัดในการทำประกัน</span>
+      </div>
+
+      <div class="divider">ข้อมูลที่อยู่อาศัย</div>
+      <div class="field">
+        <label>ประเภทที่อยู่อาศัย <span class="req">*</span></label>
+        <div class="chips" id="typeChips">
+          <div class="chip sel" onclick="selChip(this,'typeChips','h_type')">บ้านเดี่ยว</div>
+          <div class="chip sm" onclick="selChip(this,'typeChips','h_type')">บ้านแฝด / ทาวน์โฮม / ตึกแถว</div>
+          <div class="chip sm" onclick="selChip(this,'typeChips','h_type')">คอนโดมิเนียม / ห้องชุด</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>จังหวัดที่ตั้งของที่อยู่อาศัย <span class="req">*</span></label>
+        <input type="text" id="province" name="จังหวัด" placeholder="เช่น กรุงเทพมหานคร, เชียงใหม่, ภูเก็ต" oninput="updateRec()"/>
+      </div>
+
+      <div class="divider">ทุนประกันภัย</div>
+      <div class="field">
+        <label>1. สิ่งปลูกสร้าง <div class="tip-wrap"><div class="tip-btn">i</div><div class="tip">ตัวบ้าน อาคาร โรงรถ กำแพง รั้ว ประตู สระว่ายน้ำ ส่วนปรับปรุงต่อเติม — ไม่รวมมูลค่าที่ดิน</div></div></label>
+        <div class="field-hint">ตัวบ้าน อาคาร ผนัง หลังคา พื้น ฝ้า ประตู หน้าต่าง — ไม่รวมมูลค่าที่ดิน</div>
+        <select name="ทุนประกัน_สิ่งปลูกสร้าง">
+          <option>ยังไม่แน่ใจ — ให้ช่วยประเมิน</option>
+          <option>500,000 บาท</option>
+          <option>1,000,000 บาท</option>
+          <option>2,000,000 บาท</option>
+          <option>3,000,000 บาทขึ้นไป</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>2. ทรัพย์สินภายในบ้าน <div class="tip-wrap"><div class="tip-btn">i</div><div class="tip">เฟอร์นิเจอร์ เครื่องตกแต่ง เครื่องใช้ไฟฟ้า เครื่องดนตรี เครื่องครัว และทรัพย์สินที่เคลื่อนย้ายได้</div></div></label>
+        <div class="field-hint">เฟอร์นิเจอร์ เครื่องใช้ไฟฟ้า ของใช้ภายในบ้าน</div>
+        <select name="ทุนประกัน_ทรัพย์สินภายในบ้าน">
+          <option>ยังไม่แน่ใจ — ให้ช่วยประเมิน</option>
+          <option>100,000 บาท</option>
+          <option>300,000 บาท</option>
+          <option>500,000 บาท</option>
+          <option>1,000,000 บาทขึ้นไป</option>
+        </select>
+      </div>
+
+      <div class="divider">ความคุ้มครอง</div>
+      <div class="cov-group">
+        <div class="cov-group-lbl"><i class="bi bi-lock-fill"></i> คุ้มครองพื้นฐาน — รวมในทุกแผน</div>
+        <label class="cov-row locked"><input type="checkbox" checked disabled/><span>ไฟไหม้ / ฟ้าผ่า / ระเบิด</span><span class="cov-badge badge-inc">รวมแล้ว</span></label>
+        <label class="cov-row locked"><input type="checkbox" checked disabled/><span>ยวดยานพาหนะ / อากาศยาน</span><span class="cov-badge badge-inc">รวมแล้ว</span></label>
+        <label class="cov-row locked"><input type="checkbox" checked disabled/><span>ลมพายุ / แผ่นดินไหว / ลูกเห็บ</span><span class="cov-badge badge-inc">รวมแล้ว</span></label>
+      </div>
+      <div class="cov-group" style="margin-bottom:0">
+        <div class="cov-group-lbl"><i class="bi bi-plus-circle-fill"></i> เลือกความคุ้มครองเพิ่มเติม</div>
+        <label class="cov-row"><input type="checkbox" id="cov_flood" checked onchange="updateCoverage()"/><span style="font-weight:500">น้ำท่วม / อุทกภัย</span><span class="cov-badge badge-rec" id="badge-flood">แนะนำ</span></label>
+        <label class="cov-row"><input type="checkbox" id="cov_theft" onchange="updateCoverage()"/><span>โจรกรรม / ลักทรัพย์</span></label>
+        <label class="cov-row"><input type="checkbox" id="cov_glass" onchange="updateCoverage()"/><span>ความเสียหายต่อกระจก</span></label>
+        <label class="cov-row"><input type="checkbox" id="cov_elec" onchange="updateCoverage()"/><span>ความเสียหายจากภัยต่อเครื่องใช้ไฟฟ้า</span></label>
       </div>
     </div>
-    <div class="field">
-      <label>จังหวัดที่ตั้งของที่อยู่อาศัย <span class="req">*</span></label>
-      <input type="text" id="province" placeholder="เช่น กรุงเทพมหานคร, เชียงใหม่, ภูเก็ต" oninput="updateRec()"/>
-    </div>
 
-    <div class="divider">ทุนประกันภัย</div>
-    <div class="field">
-      <label>1. สิ่งปลูกสร้าง <div class="tip-wrap"><div class="tip-btn">i</div><div class="tip">ตัวบ้าน อาคาร โรงรถ กำแพง รั้ว ประตู สระว่ายน้ำ ส่วนปรับปรุงต่อเติม — ไม่รวมมูลค่าที่ดิน</div></div></label>
-      <div class="field-hint">ตัวบ้าน อาคาร ผนัง หลังคา พื้น ฝ้า ประตู หน้าต่าง — ไม่รวมมูลค่าที่ดิน</div>
-      <select><option>ยังไม่แน่ใจ — ให้ช่วยประเมิน</option><option>500,000 บาท</option><option>1,000,000 บาท</option><option>2,000,000 บาท</option><option>3,000,000 บาทขึ้นไป</option></select>
-    </div>
-    <div class="field">
-      <label>2. ทรัพย์สินภายในบ้าน <div class="tip-wrap"><div class="tip-btn">i</div><div class="tip">เฟอร์นิเจอร์ เครื่องตกแต่ง เครื่องใช้ไฟฟ้า เครื่องดนตรี เครื่องครัว และทรัพย์สินที่เคลื่อนย้ายได้</div></div></label>
-      <div class="field-hint">เฟอร์นิเจอร์ เครื่องใช้ไฟฟ้า ของใช้ภายในบ้าน</div>
-      <select><option>ยังไม่แน่ใจ — ให้ช่วยประเมิน</option><option>100,000 บาท</option><option>300,000 บาท</option><option>500,000 บาท</option><option>1,000,000 บาทขึ้นไป</option></select>
-    </div>
-
-    <div class="divider">ความคุ้มครอง</div>
-    <div class="cov-group">
-      <div class="cov-group-lbl"><i class="bi bi-lock-fill"></i> คุ้มครองพื้นฐาน — รวมในทุกแผน</div>
-      <label class="cov-row locked"><input type="checkbox" checked disabled/><span>ไฟไหม้ / ฟ้าผ่า / ระเบิด</span><span class="cov-badge badge-inc">รวมแล้ว</span></label>
-      <label class="cov-row locked"><input type="checkbox" checked disabled/><span>ยวดยานพาหนะ / อากาศยาน</span><span class="cov-badge badge-inc">รวมแล้ว</span></label>
-      <label class="cov-row locked"><input type="checkbox" checked disabled/><span>ลมพายุ / แผ่นดินไหว / ลูกเห็บ</span><span class="cov-badge badge-inc">รวมแล้ว</span></label>
-    </div>
-    <div class="cov-group" style="margin-bottom:0">
-      <div class="cov-group-lbl"><i class="bi bi-plus-circle-fill"></i> เลือกความคุ้มครองเพิ่มเติม</div>
-      <label class="cov-row"><input type="checkbox" checked/><span style="font-weight:500">น้ำท่วม / อุทกภัย</span><span class="cov-badge badge-rec" id="badge-flood">แนะนำ</span></label>
-      <label class="cov-row"><input type="checkbox"/><span>โจรกรรม / ลักทรัพย์</span></label>
-      <label class="cov-row"><input type="checkbox"/><span>ความเสียหายต่อกระจก</span></label>
-      <label class="cov-row"><input type="checkbox"/><span>ความเสียหายจากภัยต่อเครื่องใช้ไฟฟ้า</span></label>
-    </div>
-  </div>
-
-  <!-- Card 2: ข้อมูลผู้ติดต่อ -->
-  <div class="form-wrap" style="margin-top:14px">
-    <div class="divider" style="margin-top:0">ข้อมูลผู้ติดต่อ</div>
-    <div class="two-col">
-      <div class="field"><label>ชื่อ <span class="req">*</span></label><input type="text" placeholder="เช่น สมชาย"/></div>
-      <div class="field"><label>นามสกุล</label><input type="text" placeholder="เช่น ใจดี"/></div>
-    </div>
-    <div class="field"><label>เบอร์โทรศัพท์ / LINE ID <span class="req">*</span></label><input type="tel" placeholder="เช่น 081-234-5678"/></div>
-    <div class="field">
-      <label>ช่องทางที่สะดวกรับใบเสนอราคา</label>
-      <div class="chips" id="chanChips">
-        <div class="chip sel" onclick="selChip(this,'chanChips')"><i class="bi bi-line" style="color:#06C755"></i> LINE</div>
-        <div class="chip" onclick="selChip(this,'chanChips')"><i class="bi bi-telephone-fill"></i> โทรกลับ</div>
+    <!-- Card 2: ข้อมูลผู้ติดต่อ -->
+    <div class="form-wrap" style="margin-top:14px">
+      <div class="divider" style="margin-top:0">ข้อมูลผู้ติดต่อ</div>
+      <div class="two-col">
+        <div class="field"><label>ชื่อ <span class="req">*</span></label><input type="text" name="ชื่อ" placeholder="เช่น สมชาย" required/></div>
+        <div class="field"><label>นามสกุล</label><input type="text" name="นามสกุล" placeholder="เช่น ใจดี"/></div>
+      </div>
+      <div class="field"><label>เบอร์โทรศัพท์ / LINE ID <span class="req">*</span></label><input type="tel" name="เบอร์โทร_LINE_ID" placeholder="เช่น 081-234-5678" required/></div>
+      <div class="field">
+        <label>ช่องทางที่สะดวกรับใบเสนอราคา</label>
+        <div class="chips" id="chanChips">
+          <div class="chip sel" onclick="selChip(this,'chanChips','h_channel')"><i class="bi bi-line" style="color:#06C755"></i> LINE</div>
+          <div class="chip" onclick="selChip(this,'chanChips','h_channel')"><i class="bi bi-telephone-fill"></i> โทรกลับ</div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>วันที่ต้องการเริ่มคุ้มครอง</label>
+        <input type="text" name="วันที่เริ่มคุ้มครอง" placeholder="เช่น 1 ก.พ. 2569 หรือ เร็วที่สุด"/>
       </div>
     </div>
-    <div class="field" style="margin-bottom:0"><label>วันที่ต้องการเริ่มคุ้มครอง</label><input type="text" placeholder="เช่น 1 ก.พ. 2569 หรือ เร็วที่สุด"/></div>
-  </div>
 
-  <!-- CTA -->
-  <button class="cta-btn" onclick="submitForm()" style="margin-top:14px"><i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี</button>
-  <p class="cta-micro">หากข้อมูลครบถ้วน ทีมงานจะจัดทำใบเสนอราคาให้โดยปกติภายใน 1 ชั่วโมงในเวลาทำการ<br/>ข้อมูลของคุณใช้เพื่อจัดทำใบเสนอราคาเท่านั้น ไม่มีค่าใช้จ่าย และไม่มีข้อผูกมัดในการทำประกัน</p>
+    <!-- CTA -->
+    <button type="submit" class="cta-btn" id="submitBtn" style="margin-top:14px">
+      <i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี
+    </button>
+    <p class="cta-micro">หากข้อมูลครบถ้วน ทีมงานจะจัดทำใบเสนอราคาให้โดยปกติภายใน 1 ชั่วโมงในเวลาทำการ<br/>ข้อมูลของคุณใช้เพื่อจัดทำใบเสนอราคาเท่านั้น ไม่มีค่าใช้จ่าย และไม่มีข้อผูกมัดในการทำประกัน</p>
+
+  </form>
 
   <!-- THANK YOU -->
   <div class="thank-wrap" id="thank-card" style="display:none">
     <div class="check-circle"><i class="bi bi-check-lg"></i></div>
     <h3>ได้รับข้อมูลของคุณแล้ว</h3>
-    <p>ทีมงานกำลังจัดทำใบเสนอราคา จะติดต่อกลับผ่าน LINE ภายใน 1 ชั่วโมงในเวลาทำการ</p>
+    <p>ทีมงานกำลังจัดทำใบเสนอราคา จะติดต่อกลับภายใน 1 ชั่วโมงในเวลาทำการ</p>
     <div class="sum-table">
-      <div class="sum-row"><span class="sk">ประเภท</span><span class="sv">บ้านเดี่ยว</span></div>
-      <div class="sum-row"><span class="sk">ความคุ้มครองเพิ่มเติม</span><span class="sv">น้ำท่วม</span></div>
-      <div class="sum-row"><span class="sk">ช่องทางติดต่อ</span><span class="sv">LINE</span></div>
+      <div class="sum-row"><span class="sk">ประเภท</span><span class="sv" id="ty_type"></span></div>
+      <div class="sum-row"><span class="sk">จังหวัด</span><span class="sv" id="ty_province"></span></div>
+      <div class="sum-row"><span class="sk">ความคุ้มครองที่เลือก</span><span class="sv" id="ty_coverage"></span></div>
+      <div class="sum-row"><span class="sk">ช่องทางติดต่อ</span><span class="sv" id="ty_channel"></span></div>
     </div>
-    <a class="btn-primary" href="https://line.me/R/ti/p/@SunAssured" style="display:inline-flex;justify-content:center;width:100%"><i class="bi bi-line"></i> แอด LINE @SunAssured รับใบเสนอราคา</a>
+    <a class="btn-primary" href="https://line.me/R/ti/p/@SunAssured" style="display:inline-flex;justify-content:center;width:100%"><i class="bi bi-line"></i> แอด LINE @SunAssured</a>
   </div>
 
 </div>
@@ -479,28 +506,79 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="bi bi-chevron-up"></i></button>
 
 <script>
-function selChip(el,grp){document.getElementById(grp).querySelectorAll('.chip').forEach(function(c){c.classList.remove('sel')});el.classList.add('sel')}
-function updateRec(){
-  var p=document.getElementById('province').value;
-  var north=['เชียงราย','เชียงใหม่','ลำปาง','ลำพูน','แพร่','น่าน','พะเยา','แม่ฮ่องสอน','ตาก','อุตรดิตถ์','พิษณุโลก','เพชรบูรณ์'];
-  var south=['สงขลา','ยะลา','ปัตตานี','นราธิวาส','สตูล','พัทลุง','ตรัง','กระบี่','ภูเก็ต','ระนอง','ชุมพร','สุราษฎร์','นครศรีธรรมราช','พังงา'];
-  var f=document.getElementById('badge-flood');
-  if(f){
-    if(north.some(function(x){return p.indexOf(x)>=0})||south.some(function(x){return p.indexOf(x)>=0})){
-      f.textContent='แนะนำสำหรับพื้นที่ของคุณ';
+// Chip selector — อัปเดต hidden input ด้วย
+function selChip(el, grp, hiddenId) {
+  document.getElementById(grp).querySelectorAll('.chip').forEach(function(c){ c.classList.remove('sel'); });
+  el.classList.add('sel');
+  if (hiddenId) document.getElementById(hiddenId).value = el.textContent.trim();
+}
+
+// Badge แนะนำตามจังหวัด
+function updateRec() {
+  var p = document.getElementById('province').value;
+  var north = ['เชียงราย','เชียงใหม่','ลำปาง','ลำพูน','แพร่','น่าน','พะเยา','แม่ฮ่องสอน','ตาก','อุตรดิตถ์','พิษณุโลก','เพชรบูรณ์'];
+  var south = ['สงขลา','ยะลา','ปัตตานี','นราธิวาส','สตูล','พัทลุง','ตรัง','กระบี่','ภูเก็ต','ระนอง','ชุมพร','สุราษฎร์','นครศรีธรรมราช','พังงา'];
+  var f = document.getElementById('badge-flood');
+  if (f) f.textContent = (north.some(function(x){return p.indexOf(x)>=0}) || south.some(function(x){return p.indexOf(x)>=0})) ? 'แนะนำสำหรับพื้นที่ของคุณ' : 'แนะนำ';
+}
+
+// อัปเดต hidden field ความคุ้มครองที่เลือก
+function updateCoverage() {
+  var selected = [];
+  if (document.getElementById('cov_flood').checked) selected.push('น้ำท่วม / อุทกภัย');
+  if (document.getElementById('cov_theft').checked) selected.push('โจรกรรม / ลักทรัพย์');
+  if (document.getElementById('cov_glass').checked) selected.push('ความเสียหายต่อกระจก');
+  if (document.getElementById('cov_elec').checked) selected.push('ความเสียหายจากภัยต่อเครื่องใช้ไฟฟ้า');
+  document.getElementById('h_coverage').value = selected.join(', ') || '-';
+}
+
+// Submit → ส่ง Formspree แล้วแสดง thank-you
+async function submitForm(e) {
+  e.preventDefault();
+  updateCoverage();
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> กำลังส่งข้อมูล...';
+
+  var form = document.getElementById('form-main');
+  var data = new FormData(form);
+
+  try {
+    var res = await fetch('https://formspree.io/f/mlgybdgk', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (res.ok) {
+      // แสดง thank-you card พร้อมสรุปข้อมูล
+      document.getElementById('ty_type').textContent = document.getElementById('h_type').value;
+      document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
+      document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || 'ไม่ระบุ';
+      document.getElementById('ty_channel').textContent = document.getElementById('h_channel').value;
+      form.style.display = 'none';
+      document.getElementById('thank-card').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('thank-card').offsetTop - 80, behavior: 'smooth' });
     } else {
-      f.textContent='แนะนำ';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี';
+      alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือติดต่อ LINE @SunAssured โดยตรงครับ');
     }
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-shield-check-fill"></i> ขอใบเสนอราคาประกันภัยที่อยู่อาศัยฟรี';
+    alert('ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่ หรือติดต่อ LINE @SunAssured โดยตรงครับ');
   }
 }
-function submitForm(){
-  document.getElementById('form-main').style.display='none';
-  document.getElementById('thank-card').style.display='block';
-}
-window.addEventListener('scroll',function(){
-  var btn=document.getElementById('scrollTop');
-  if(window.scrollY>400){btn.classList.add('show');}else{btn.classList.remove('show');}
+
+window.addEventListener('scroll', function(){
+  var btn = document.getElementById('scrollTop');
+  if (window.scrollY > 400) { btn.classList.add('show'); } else { btn.classList.remove('show'); }
 });
+
+// Init coverage hidden field
+updateCoverage();
 </script>
 </body>
 </html>
