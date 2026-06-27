@@ -374,8 +374,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
 
     <!-- hidden fields สำหรับ chip/checkbox values -->
     <input type="hidden" id="h_type" name="ประเภทที่อยู่อาศัย" value="บ้านเดี่ยว"/>
+    <!-- Honeypot: ซ่อนจากคนจริง bot จะกรอก -->
+    <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
+      <input type="text" name="website" id="honeypot" tabindex="-1" autocomplete="off"/>
+    </div>
     <input type="hidden" id="h_channel" name="ช่องทางติดต่อ" value="LINE"/>
     <input type="hidden" id="h_coverage" name="ความคุ้มครองเพิ่มเติมที่เลือก" value=""/>
+    <input type="hidden" id="h_owner" name="สถานะผู้ขอเอาประกันภัย" value="เจ้าของทรัพย์สิน"/>
+    <input type="hidden" id="h_duration" name="ระยะเวลาคุ้มครอง" value="1 ปี"/>
 
     <!-- Card 1: ข้อมูลที่อยู่อาศัย + ทุนประกัน + ความคุ้มครอง -->
     <div class="form-wrap">
@@ -397,8 +403,27 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
         </div>
       </div>
       <div class="field">
+        <label>โครงสร้าง (วัสดุ) สิ่งปลูกสร้าง <span class="req">*</span></label>
+        <select name="โครงสร้างสิ่งปลูกสร้าง" id="structure" required>
+          <option value="">— กรุณาเลือก —</option>
+          <option value="Concrete (คอนกรีตล้วน)">Concrete — คอนกรีตล้วน</option>
+          <option value="Semi Concrete (ครึ่งปูนครึ่งไม้)">Semi Concrete — ครึ่งปูนครึ่งไม้</option>
+          <option value="Wood / Other (ไม้ล้วน / อื่นๆ)">Wood / Other — ไม้ล้วน / อื่นๆ</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>สถานะผู้ขอเอาประกันภัย <span class="req">*</span></label>
+        <div class="chips" id="ownerChips">
+          <div class="chip sel" onclick="selChip(this,'ownerChips','h_owner')">เจ้าของทรัพย์สิน</div>
+          <div class="chip" onclick="selChip(this,'ownerChips','h_owner')">ผู้เช่า</div>
+        </div>
+        <div id="tenant-warn" style="display:none;margin-top:8px;padding:10px 13px;background:#FFF5E0;border:1px solid #FAE3BF;border-radius:9px;font-size:12px;color:#854F0B">
+          <i class="bi bi-exclamation-triangle-fill"></i> แผนนี้รับประกันเฉพาะ <strong>เจ้าของทรัพย์สิน</strong> เท่านั้น ตามเงื่อนไขการรับประกันภัย กรุณาติดต่อทีมงานเพื่อสอบถามเพิ่มเติมครับ
+        </div>
+      </div>
+      <div class="field">
         <label>จังหวัดที่ตั้งของที่อยู่อาศัย <span class="req">*</span></label>
-        <input type="text" id="province" name="จังหวัด" placeholder="เช่น กรุงเทพมหานคร, เชียงใหม่, ภูเก็ต" oninput="updateRec()"/>
+        <input type="text" id="province" autocomplete="off" name="จังหวัด" placeholder="เช่น กรุงเทพมหานคร, เชียงใหม่, ภูเก็ต" oninput="updateRec()"/>
       </div>
 
       <div class="divider">ทุนประกันภัย</div>
@@ -422,6 +447,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
           <option>300,000 บาท</option>
           <option>500,000 บาท</option>
           <option>1,000,000 บาทขึ้นไป</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>3. อื่นๆ <div class="tip-wrap"><div class="tip-btn">i</div><div class="tip">ทรัพย์สินอื่นที่เกี่ยวข้องกับการอยู่อาศัย ซึ่งต้องเลือกจากรายการที่กำหนดไว้เท่านั้น เช่น รถกอล์ฟที่ใช้ภายในบริเวณที่อยู่อาศัย และที่ชาร์จรถยนต์ไฟฟ้าแบบติดผนัง (EV Wall Charger)</div></div></label>
+        <div class="field-hint">ทรัพย์สินพิเศษที่ต้องระบุเพิ่มเติม (ต้องเลือกจากรายการที่กำหนดเท่านั้น)</div>
+        <select name="ทรัพย์สินอื่นๆ">
+          <option value="">ไม่มี</option>
+          <option value="ที่ชาร์จรถยนต์ไฟฟ้าแบบติดผนัง (EV Wall Charger)">ที่ชาร์จรถยนต์ไฟฟ้าแบบติดผนัง (EV Wall Charger)</option>
+          <option value="รถกอล์ฟที่ใช้ภายในบริเวณที่อยู่อาศัย">รถกอล์ฟที่ใช้ภายในบริเวณที่อยู่อาศัย</option>
+          <option value="ที่ชาร์จ EV + รถกอล์ฟ">ที่ชาร์จ EV + รถกอล์ฟ</option>
+          <option value="อื่นๆ (แจ้งเพิ่มเติม)">อื่นๆ (แจ้งเพิ่มเติม)</option>
         </select>
       </div>
 
@@ -452,10 +488,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
     <div class="form-wrap" style="margin-top:14px">
       <div class="divider" style="margin-top:0">ข้อมูลผู้ติดต่อ</div>
       <div class="two-col">
-        <div class="field"><label>ชื่อ <span class="req">*</span></label><input type="text" name="ชื่อ" placeholder="เช่น สมชาย" required/></div>
-        <div class="field"><label>นามสกุล</label><input type="text" name="นามสกุล" placeholder="เช่น ใจดี"/></div>
+        <div class="field"><label>ชื่อ <span class="req">*</span></label><input type="text" name="ชื่อ" placeholder="เช่น สมชาย" required autocomplete="given-name"/></div>
+        <div class="field"><label>นามสกุล</label><input type="text" name="นามสกุล" placeholder="เช่น ใจดี" autocomplete="family-name"/></div>
       </div>
-      <div class="field"><label>เบอร์โทรศัพท์ / LINE ID <span class="req">*</span></label><input type="tel" name="เบอร์โทร_LINE_ID" placeholder="เช่น 081-234-5678" required/></div>
+      <div class="field"><label>เบอร์โทรศัพท์ / LINE ID <span class="req">*</span></label><input type="tel" name="เบอร์โทร_LINE_ID" placeholder="เช่น 081-234-5678" required autocomplete="off" inputmode="tel" maxlength="15"/></div>
       <div class="field">
         <label>ช่องทางที่สะดวกรับใบเสนอราคา</label>
         <div class="chips" id="chanChips">
@@ -463,9 +499,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:16
           <div class="chip" onclick="selChip(this,'chanChips','h_channel')"><i class="bi bi-telephone-fill"></i> โทรกลับ</div>
         </div>
       </div>
+      <div class="field">
+        <label>ระยะเวลาคุ้มครอง</label>
+        <div class="chips" id="durationChips" style="margin-bottom:0">
+          <div class="chip sel" onclick="selChip(this,'durationChips','h_duration')">1 ปี</div>
+          <div class="chip" onclick="selChip(this,'durationChips','h_duration')">2 ปี</div>
+          <div class="chip" onclick="selChip(this,'durationChips','h_duration')">3 ปี</div>
+          <div class="chip" onclick="selChip(this,'durationChips','h_duration')">ยังไม่แน่ใจ</div>
+        </div>
+      </div>
       <div class="field" style="margin-bottom:0">
         <label>วันที่ต้องการเริ่มคุ้มครอง</label>
-        <input type="text" name="วันที่เริ่มคุ้มครอง" placeholder="เช่น 1 ก.พ. 2569 หรือ เร็วที่สุด"/>
+        <input type="text" name="วันที่เริ่มคุ้มครอง" placeholder="เช่น 1 ก.พ. 2569 หรือ เร็วที่สุด" autocomplete="off"/>
       </div>
     </div>
 
@@ -570,12 +615,60 @@ function submitForm(e) {
   var chanEl = document.querySelector('#chanChips .chip.sel');
   if (chanEl) document.getElementById('h_channel').value = chanEl.textContent.trim();
 
-  // Validate
+  // Honeypot check — ถ้ามีค่า = bot
+  if (document.getElementById('honeypot').value !== '') {
+    // เงียบ ๆ ไม่ส่ง ไม่แจ้ง
+    document.getElementById('form-main').style.display = 'none';
+    document.getElementById('thank-card').style.display = 'block';
+    return;
+  }
+
+  // Validate ชื่อและเบอร์
   var name  = document.querySelector('input[name="ชื่อ"]').value.trim();
   var phone = document.querySelector('input[name="เบอร์โทร_LINE_ID"]').value.trim();
-  if (!name || !phone) {
-    alert('กรุณากรอกชื่อและเบอร์โทรศัพท์ / LINE ID ครับ');
+  if (!name) {
+    alert('กรุณากรอกชื่อครับ');
     return;
+  }
+  if (!phone) {
+    alert('กรุณากรอกเบอร์โทรศัพท์หรือ LINE ID ครับ');
+    return;
+  }
+  // Validate เบอร์โทรศัพท์ไทย
+  var digitsOnly = phone.replace(/[-\s]/g, '');
+  var isNumeric  = /^\d+$/.test(digitsOnly);
+
+  if (isNumeric) {
+    // ต้องมี 9–10 หลัก
+    if (digitsOnly.length < 9 || digitsOnly.length > 10) {
+      alert('เบอร์โทรศัพท์ต้องมี 9–10 หลักครับ');
+      return;
+    }
+    // ต้องขึ้นต้นด้วย 0
+    if (digitsOnly[0] !== '0') {
+      alert('เบอร์โทรศัพท์ไทยต้องขึ้นต้นด้วย 0 ครับ');
+      return;
+    }
+    // เบอร์มือถือต้องขึ้นต้น 06x, 08x, 09x
+    // เบอร์บ้าน/สำนักงาน 02x–05x ก็รับ
+    var prefix2 = digitsOnly.substring(0, 2);
+    var validPrefix = ['02','03','04','05','06','08','09'];
+    if (!validPrefix.some(function(p){ return prefix2 === p; })) {
+      alert('รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้งครับ');
+      return;
+    }
+    // เลขซ้ำกันเกิน 7 ตัว (เช่น 0819999999, 0800000000)
+    var repeatMatch = digitsOnly.match(/(\d)\1{6,}/);
+    if (repeatMatch) {
+      alert('กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้องครับ');
+      return;
+    }
+    // เบอร์ทดสอบที่พบบ่อย
+    var testNumbers = ['0800000000','0900000000','0000000000','1234567890','0123456789','0987654321'];
+    if (testNumbers.indexOf(digitsOnly) !== -1) {
+      alert('กรุณากรอกเบอร์โทรศัพท์ที่ใช้งานได้จริงครับ');
+      return;
+    }
   }
 
   // แสดง thank-you ทันที
@@ -583,6 +676,20 @@ function submitForm(e) {
   document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
   document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
   document.getElementById('ty_channel').textContent  = document.getElementById('h_channel').value;
+  // Reset form ล้างข้อมูลทั้งหมด
+  document.getElementById('form-main').querySelectorAll('input[type="text"], input[type="tel"]').forEach(function(el){
+    if (el.id !== 'honeypot') el.value = '';
+  });
+  document.getElementById('form-main').querySelectorAll('select').forEach(function(el){
+    el.selectedIndex = 0;
+  });
+  // Reset chips กลับ default
+  document.querySelectorAll('#typeChips .chip').forEach(function(el,i){ el.classList.toggle('sel', i===0); });
+  document.querySelectorAll('#chanChips .chip').forEach(function(el,i){ el.classList.toggle('sel', i===0); });
+  document.getElementById('cov_extra').checked = true;
+  document.getElementById('h_type').value = 'บ้านเดี่ยว';
+  document.getElementById('h_channel').value = 'LINE';
+
   document.getElementById('form-main').style.display = 'none';
   document.getElementById('thank-card').style.display = 'block';
   window.scrollTo({ top: document.getElementById('quote').offsetTop - 80, behavior: 'smooth' });
@@ -604,6 +711,18 @@ function submitForm(e) {
   var img = new Image();
   img.src = 'https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec?' + params.toString();
 }
+
+// Tenant warning toggle
+document.querySelectorAll('#ownerChips .chip').forEach(function(chip) {
+  chip.addEventListener('click', function() {
+    var warn = document.getElementById('tenant-warn');
+    if (this.textContent.trim() === 'ผู้เช่า') {
+      warn.style.display = 'block';
+    } else {
+      warn.style.display = 'none';
+    }
+  });
+});
 
 // Init
 updateCoverage();
