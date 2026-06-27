@@ -675,44 +675,46 @@ function submitForm(e) {
     }
   }
 
-  // แสดง thank-you ทันที
-  document.getElementById('ty_type').textContent     = document.getElementById('h_type').value;
-  document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
-  document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
-  document.getElementById('ty_channel').textContent  = document.getElementById('h_channel').value;
-  // Reset form ล้างข้อมูลทั้งหมด
-  ['fname','lname','phone','startdate','province'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('form-main').querySelectorAll('select').forEach(function(el){
-    el.selectedIndex = 0;
-  });
-  // Reset chips กลับ default
-  document.querySelectorAll('#typeChips .chip').forEach(function(el,i){ el.classList.toggle('sel', i===0); });
-  document.querySelectorAll('#chanChips .chip').forEach(function(el,i){ el.classList.toggle('sel', i===0); });
-  document.getElementById('cov_extra').checked = true;
-  document.getElementById('h_type').value = 'บ้านเดี่ยว';
-  document.getElementById('h_channel').value = 'LINE';
-
-  document.getElementById('form-main').style.display = 'none';
-  document.getElementById('thank-card').style.display = 'block';
-  window.scrollTo({ top: document.getElementById('quote').offsetTop - 80, behavior: 'smooth' });
-
-  // ส่งข้อมูลไป Google Sheets ใน background
+  // เก็บข้อมูลก่อน reset (สำคัญมาก!)
   var params = new URLSearchParams({
     name:      document.getElementById('fname') ? document.getElementById('fname').value.trim() : '',
     lastname:  document.getElementById('lname') ? document.getElementById('lname').value.trim() : '',
     phone:     document.getElementById('phone') ? document.getElementById('phone').value.trim() : '',
     startdate: document.getElementById('startdate') ? document.getElementById('startdate').value.trim() : '',
-    channel:   document.getElementById('h_channel').value,
-    type:      document.getElementById('h_type').value,
+    channel:   document.getElementById('h_channel') ? document.getElementById('h_channel').value : '',
+    type:      document.getElementById('h_type') ? document.getElementById('h_type').value : '',
     structure: document.getElementById('structure') ? document.getElementById('structure').value : '',
     owner:     document.getElementById('h_owner') ? document.getElementById('h_owner').value : '',
     province:  document.getElementById('province') ? document.getElementById('province').value.trim() : '',
     sum1:      document.getElementById('sum1') ? document.getElementById('sum1').value : '',
     sum2:      document.getElementById('sum2') ? document.getElementById('sum2').value : '',
     sum3:      document.getElementById('sum3') ? document.getElementById('sum3').value : '',
-    coverage:  document.getElementById('h_coverage').value,
+    coverage:  document.getElementById('h_coverage') ? document.getElementById('h_coverage').value : '',
     duration:  document.getElementById('h_duration') ? document.getElementById('h_duration').value : ''
-    });
+  });
+
+  // ส่งไป Google Sheets (fire-and-forget)
+  var img = new Image();
+  img.src = 'https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec?' + params.toString();
+
+  // แสดง thank-you
+  document.getElementById('ty_type').textContent     = document.getElementById('h_type').value;
+  document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
+  document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
+  document.getElementById('ty_channel').textContent  = document.getElementById('h_channel').value;
+
+  // Reset form หลังเก็บข้อมูลแล้ว
+  ['fname','lname','phone','startdate','province'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('form-main').querySelectorAll('select').forEach(function(el){ el.selectedIndex = 0; });
+  document.querySelectorAll('#typeChips .chip').forEach(function(el,i){ el.classList.toggle('sel', i===0); });
+  document.querySelectorAll('#chanChips .chip').forEach(function(el,i){ el.classList.toggle('sel', i===0); });
+  if (document.getElementById('cov_extra')) document.getElementById('cov_extra').checked = true;
+  if (document.getElementById('h_type')) document.getElementById('h_type').value = 'บ้านเดี่ยว';
+  if (document.getElementById('h_channel')) document.getElementById('h_channel').value = 'LINE';
+
+  document.getElementById('form-main').style.display = 'none';
+  document.getElementById('thank-card').style.display = 'block';
+  window.scrollTo({ top: document.getElementById('quote').offsetTop - 80, behavior: 'smooth' });
 }
 // Brochure modal
 function openBrochure() {
