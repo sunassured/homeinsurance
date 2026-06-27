@@ -559,8 +559,8 @@ function updateCoverage() {
     : 'ไม่ต้องการความคุ้มครองเพิ่มเติม';
 }
 
-// Submit → ส่งไป Google Sheets
-async function submitForm(e) {
+// Submit → แสดง thank-you ก่อน แล้วส่งข้อมูล background
+function submitForm(e) {
   e.preventDefault();
 
   // Sync hidden fields
@@ -570,53 +570,39 @@ async function submitForm(e) {
   var chanEl = document.querySelector('#chanChips .chip.sel');
   if (chanEl) document.getElementById('h_channel').value = chanEl.textContent.trim();
 
-  // Validate required fields
-  var name = document.querySelector('input[name="ชื่อ"]').value.trim();
+  // Validate
+  var name  = document.querySelector('input[name="ชื่อ"]').value.trim();
   var phone = document.querySelector('input[name="เบอร์โทร_LINE_ID"]').value.trim();
   if (!name || !phone) {
     alert('กรุณากรอกชื่อและเบอร์โทรศัพท์ / LINE ID ครับ');
     return;
   }
 
-  var btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> กำลังส่งข้อมูล...';
+  // แสดง thank-you ทันที
+  document.getElementById('ty_type').textContent     = document.getElementById('h_type').value;
+  document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
+  document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
+  document.getElementById('ty_channel').textContent  = document.getElementById('h_channel').value;
+  document.getElementById('form-main').style.display = 'none';
+  document.getElementById('thank-card').style.display = 'block';
+  window.scrollTo({ top: document.getElementById('quote').offsetTop - 80, behavior: 'smooth' });
 
-  try {
-    // รวบรวมข้อมูลเป็น URL params แล้วส่งเป็น GET (ไม่มีปัญหา CORS)
-    var params = new URLSearchParams({
-      name:      document.querySelector('input[name="ชื่อ"]').value.trim(),
-      lastname:  document.querySelector('input[name="นามสกุล"]').value.trim(),
-      phone:     document.querySelector('input[name="เบอร์โทร_LINE_ID"]').value.trim(),
-      startdate: document.querySelector('input[name="วันที่เริ่มคุ้มครอง"]').value.trim(),
-      channel:   document.getElementById('h_channel').value,
-      type:      document.getElementById('h_type').value,
-      province:  document.getElementById('province').value.trim(),
-      sum1:      document.querySelector('select[name="ทุนประกัน_สิ่งปลูกสร้าง"]').value,
-      sum2:      document.querySelector('select[name="ทุนประกัน_ทรัพย์สินภายในบ้าน"]').value,
-      coverage:  document.getElementById('h_coverage').value
-    });
+  // ส่งข้อมูลไป Google Sheets ใน background
+  var params = new URLSearchParams({
+    name:      document.querySelector('input[name="ชื่อ"]').value.trim(),
+    lastname:  document.querySelector('input[name="นามสกุล"]').value.trim(),
+    phone:     document.querySelector('input[name="เบอร์โทร_LINE_ID"]').value.trim(),
+    startdate: document.querySelector('input[name="วันที่เริ่มคุ้มครอง"]').value.trim(),
+    channel:   document.getElementById('h_channel').value,
+    type:      document.getElementById('h_type').value,
+    province:  document.getElementById('province').value.trim(),
+    sum1:      document.querySelector('select[name="ทุนประกัน_สิ่งปลูกสร้าง"]').value,
+    sum2:      document.querySelector('select[name="ทุนประกัน_ทรัพย์สินภายในบ้าน"]').value,
+    coverage:  document.getElementById('h_coverage').value
+  });
 
-    // Fire-and-forget — ไม่ await เพราะ no-cors ค้าง แต่ข้อมูลส่งถึง Sheet แน่นอน
-    fetch('https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec?' + params.toString(), {
-      method: 'GET',
-      mode: 'no-cors'
-    });
-
-    // แสดง thank-you ทันทีโดยไม่รอ fetch
-    document.getElementById('ty_type').textContent = document.getElementById('h_type').value;
-    document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
-    document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
-    document.getElementById('ty_channel').textContent = document.getElementById('h_channel').value;
-    form.style.display = 'none';
-    document.getElementById('thank-card').style.display = 'block';
-    window.scrollTo({ top: document.getElementById('thank-card').offsetTop - 80, behavior: 'smooth' });
-
-  } catch(err) {
-    // fallback กรณี error
-    form.style.display = 'none';
-    document.getElementById('thank-card').style.display = 'block';
-  }
+  var img = new Image();
+  img.src = 'https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec?' + params.toString();
 }
 
 // Init
