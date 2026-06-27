@@ -597,13 +597,13 @@ async function submitForm(e) {
       coverage:  document.getElementById('h_coverage').value
     });
 
-    // GET request — ไม่มีปัญหา CORS กับ Google Apps Script
-    await fetch('https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec?' + params.toString(), {
+    // Fire-and-forget — ไม่ await เพราะ no-cors ค้าง แต่ข้อมูลส่งถึง Sheet แน่นอน
+    fetch('https://script.google.com/macros/s/AKfycbxlLOaGrURSfkLHRdXvg82DHZF-M67i44v9OTCI9H0Nk6ljO4CsaU8VYGmaED4MUbHEPw/exec?' + params.toString(), {
       method: 'GET',
       mode: 'no-cors'
     });
 
-    // แสดงผล thank-you (no-cors ไม่ return response แต่ข้อมูลส่งถึงแน่นอน)
+    // แสดง thank-you ทันทีโดยไม่รอ fetch
     document.getElementById('ty_type').textContent = document.getElementById('h_type').value;
     document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
     document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
@@ -613,14 +613,9 @@ async function submitForm(e) {
     window.scrollTo({ top: document.getElementById('thank-card').offsetTop - 80, behavior: 'smooth' });
 
   } catch(err) {
-    // no-cors อาจ throw error แม้ข้อมูลส่งสำเร็จ — แสดง thank-you ได้เลย
-    document.getElementById('ty_type').textContent = document.getElementById('h_type').value;
-    document.getElementById('ty_province').textContent = document.getElementById('province').value || '-';
-    document.getElementById('ty_coverage').textContent = document.getElementById('h_coverage').value || '-';
-    document.getElementById('ty_channel').textContent = document.getElementById('h_channel').value;
+    // fallback กรณี error
     form.style.display = 'none';
     document.getElementById('thank-card').style.display = 'block';
-    window.scrollTo({ top: document.getElementById('thank-card').offsetTop - 80, behavior: 'smooth' });
   }
 }
 
